@@ -11,38 +11,52 @@ url_market = CONFIGS['url_market']
 
 class Crawler():
     options = webdriver.ChromeOptions()
+    #options.binary_location=str(os.environ.get('GOOGLE_CHROME_BIN')) # REQUIRED FOR HEROKU
+    #options.add_argument('--disable-gpu') # REQUIRED FOR HEROKU
+    #options.add_argument('--no-sandbox') # REQUIRED FOR HEROKU
     options.add_argument("browser.download.folderList=2");
     options.add_argument("browser.helperApps.alwaysAsk.force=False");
     options.add_argument("browser.download.manager.showWhenStarting=False");
     options.add_argument("browser.download.manager.showAlertOnComplete=False");
     options.add_argument("browser.helperApps.neverAsk.saveToDisk=True");
+    #options.add_argument(f"browser.download.dir={download_dir}");
     options.add_argument('--no-proxy-server');
     options.add_argument("--proxy-server='direct://'");
     options.add_argument("--proxy-bypass-list=*");
     options.headless = True
-    
-    driver = webdriver.Chrome(options=options)
-    
+   
+    #driver = webdriver.Chrome(options=options)
     # gold price
     def get_gold_price(self, url):
-        self.driver.get(url)
-        gold_price = self.driver.find_element(By.ID, "metal-priceask").text
+        driver = webdriver.Chrome(options=self.options)
+        driver.get(url)
+        gold_price = driver.find_element(By.ID, "metal-priceask").text
         gold_price = float(gold_price[1:].split(' ')[0].replace(',', ''))
+        driver.close()
         return gold_price
 
     # BGN/USD exchange rate
     def get_bgn_usd_rate(self, url):
-        self.driver.get(url)
-        bgn_usd = self.driver.find_element_by_xpath("//span[@class='DFlfde SwHCTb']").text
+        driver = webdriver.Chrome(options=self.options)
+        driver.get(url)
+        bgn_usd = driver.find_element(By.XPATH, "//span[@class='DFlfde SwHCTb']").text
         bgn_usd = float(bgn_usd.replace(',','.'))
+        driver.close()
         return bgn_usd
 
     # gold market
     def get_market_data(self, url):
-        self.driver.get(url)
-        lines_raw = self.driver.find_element_by_xpath("//div[@class='table-flex table-flex--inverse m-products__table']")
+        driver = webdriver.Chrome(options=self.options)
+        driver.get(url)
+        lines_raw = driver.find_element(
+            By.XPATH,
+            "//div[@class='table-flex table-flex--inverse m-products__table']"
+        )
         lines = lines_raw.text.split('\n')
-        lines = [i for i in lines if '-' not in i and i not in ['Всички продукти', 'Филтри', 'Продайте', 'Купете', 'Купуваме', 'Продаваме']]
+        lines = [i for i in lines if '-' not in i and i not in [
+            'Всички продукти', 'Филтри', 'Продайте', 'Купете', 'Купуваме', 'Продаваме'
+        ]]
+        driver.close()
         return lines
     
     def close_driver(self):
