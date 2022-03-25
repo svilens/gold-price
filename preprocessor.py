@@ -1,12 +1,8 @@
 import os
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 import pandas as pd
 from config import CONFIGS
-
-if os.name == 'nt':
-    chromedriver_dir = CONFIGS['chromedriver_dir_win']
-else:
-    chromedriver_dir = CONFIGS['chromedriver_dir_linux']
 
 url_gold_price = CONFIGS['url_gold_price']
 url_bgn_usd = CONFIGS['url_bgn_usd']
@@ -15,27 +11,22 @@ url_market = CONFIGS['url_market']
 
 class Crawler():
     options = webdriver.ChromeOptions()
-    #options.binary_location=str(os.environ.get('GOOGLE_CHROME_BIN')) # REQUIRED FOR HEROKU
-    #options.add_argument('--disable-gpu') # REQUIRED FOR HEROKU
-    #options.add_argument('--no-sandbox') # REQUIRED FOR HEROKU
     options.add_argument("browser.download.folderList=2");
     options.add_argument("browser.helperApps.alwaysAsk.force=False");
     options.add_argument("browser.download.manager.showWhenStarting=False");
     options.add_argument("browser.download.manager.showAlertOnComplete=False");
     options.add_argument("browser.helperApps.neverAsk.saveToDisk=True");
-    #options.add_argument(f"browser.download.dir={download_dir}");
     options.add_argument('--no-proxy-server');
     options.add_argument("--proxy-server='direct://'");
     options.add_argument("--proxy-bypass-list=*");
     options.headless = True
     
-    # driver = webdriver.Chrome(chrome_options=options, executable_path=chromedriver_dir)
-    driver = webdriver.Chrome(chromedriver_dir, options=options)
+    driver = webdriver.Chrome(options=options)
     
     # gold price
     def get_gold_price(self, url):
         self.driver.get(url)
-        gold_price = self.driver.find_element_by_xpath("//div[@class='IZ6rdc']").text
+        gold_price = self.driver.find_element(By.ID, "metal-priceask").text
         gold_price = float(gold_price[1:].split(' ')[0].replace(',', ''))
         return gold_price
 
