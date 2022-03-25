@@ -55,9 +55,9 @@ content = (
         html.Div(children=[
             dcc.Graph(figure=fig_price),
             html.Br(),
-            dcc.Graph(figure=fig_price),
+            dcc.Graph(figure=fig_price_diff),
             html.Br(),
-            dcc.Graph(figure=fig_price),
+            dcc.Graph(figure=fig_sell_premium),
             html.Br()
         ]),
         html.Br()
