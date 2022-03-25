@@ -11,17 +11,21 @@ from config import CONFIGS
 
 output_path = CONFIGS['output_path']
 
-df_full = pd.read_csv(f'{output_path}/gold_price.csv', parse_dates=['timestamp'])
+df_full = pd.read_csv(
+    f'{output_path}/gold_price.csv',
+    parse_dates=['timestamp'],
+    float_precision='high'
+)
 
 # start plotting
-products = df_full['product'].unique()
+products = df_full['product_std'].unique()
 
 fig_price = go.Figure()
 fig_price_diff = go.Figure()
 fig_sell_premium = go.Figure()
 
 for product in products:
-    subset = df_full.loc[df_full['product'] == product]
+    subset = df_full.loc[df_full['product_std'] == product]
     fig_price.add_traces(go.Scatter(
         x=subset['timestamp'], y=subset['sell_gr'], name=product, mode='lines'
     ))

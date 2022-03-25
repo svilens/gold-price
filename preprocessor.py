@@ -82,7 +82,20 @@ class MarketDataFormatting():
         else:
             result = 0
         return result
-    
+
+    def _standardize_product(self, product):
+        product_temp = (
+            product
+            .replace("златно ", "").replace("златна ", "")
+            # alphabet inconsistency
+            .replace("златнo ", "")
+            .replace("златен ", "").replace("монета ", "")
+            .replace("австр", "Австр").replace("френски", "Френски")
+        ).split(" ")[2:]
+        size_temp = product.split(" ")[:2]
+        product_std = " ".join(product_temp) + ', ' + " ".join(size_temp)
+        return product_std
+
     def add_more_cols(self, df, bgn_usd, gold_price):
         df['gr_pure'] = df.apply(lambda x: self._convert_to_gr(x['quantity'], x['unit']), axis=1)
         #df['product'] = df['product'].apply(lambda x: ' '.join([word for word in x.split(' ')[2:]]) if 'франк' not in x else x)
@@ -90,5 +103,6 @@ class MarketDataFormatting():
         df['sell_gr'] = (df['sell'] / df['gr_pure']).round(2)
         df['price_diff_gr'] = ((df['sell_gr'] - df['buy_gr']) / df['buy_gr']).round(4)
         df['sell_gr_premium'] = (df['sell_gr'] / (gold_price * bgn_usd / 31.103) - 1).round(4)
+        df['product_std'] = df['product'].apply(self._standardize_product)
         df.insert(0, 'timestamp', pd.Timestamp.now(tz='Europe/Sofia'))
         return df
