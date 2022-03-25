@@ -29,18 +29,18 @@ df_init = pd.DataFrame(
 df = MarketDataFormatting().add_some_cols(df_init).add_more_cols(df_init, gold_price, bgn_usd)
 
 # get the latest recorded update
-df_history = pd.read_csv(f'{output_path}/gold_price.csv', parse_dates=['timestamp'])
+df_history = pd.read_csv(f'{output_path}/gold_price.csv', parse_dates=['timestamp'], float_precision='high')
 df_prev = df_history.loc[df_history['timestamp'] == df_history['timestamp'].max()]
 
 # if the data has been updated, save it
 try:
     if len(df_prev.drop('timestamp', axis=1).compare(df.drop('timestamp', axis=1))) > 0:
         df_full = pd.concat([df_prev, df])
-        df_full.to_csv(f'{output_path}/gold_price.csv', index=False)
+        df_full.to_csv(f'{output_path}/gold_price.csv', index=False, float_format='%.4f')
     else:
-        pass
+        print('No update')
 except:
     df_full = pd.concat([df_prev, df])
-    df_full.to_csv(f'{output_path}/gold_price.csv', index=False)
+    df_full.to_csv(f'{output_path}/gold_price.csv', index=False, float_format='%.4f')
 
 print('Done!')
