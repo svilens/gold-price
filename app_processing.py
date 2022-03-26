@@ -35,12 +35,12 @@ df_prev = df_history.loc[df_history['timestamp'] == df_history['timestamp'].max(
 # if the data has been updated, save it
 try:
     if len(df_prev.drop('timestamp', axis=1).compare(df.drop('timestamp', axis=1))) > 0:
-        df_full = pd.concat([df_prev, df])
+        df_full = pd.concat([df_history, df])
         df_full.to_csv(f'{output_path}/gold_price.csv', index=False, float_format='%.4f')
     else:
         print('No update')
 except:
-    df_full = pd.concat([df_prev, df])
+    df_full = pd.concat([df_history, df])
     df_full.to_csv(f'{output_path}/gold_price.csv', index=False, float_format='%.4f')
 
 print('Done!')
