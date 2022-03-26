@@ -29,16 +29,26 @@ df_init = pd.DataFrame(
 df = MarketDataFormatting().add_some_cols(df_init).add_more_cols(df_init, gold_price, bgn_usd)
 
 # get the latest recorded update
-df_history = pd.read_csv(f'{output_path}/gold_price.csv', parse_dates=['timestamp'], float_precision='high')
+df_history = (
+    pd.read_csv(
+        f'{output_path}/gold_price.csv', parse_dates=['timestamp'], float_precision='high'
+    )
+)
 df_prev = df_history.loc[df_history['timestamp'] == df_history['timestamp'].max()]
 
 # if the data has been updated, save it
 try:
-    if len(df_prev.drop('timestamp', axis=1).compare(df.drop('timestamp', axis=1))) > 0:
+    if len(
+           df_prev.drop('timestamp', axis=1).reset_index(drop=True)
+           .compare(df.drop('timestamp', axis=1).reset_index(drop=True))
+        ) > 0:
         df_full = pd.concat([df_history, df])
         df_full.to_csv(f'{output_path}/gold_price.csv', index=False, float_format='%.4f')
+        print('Updated the latest data')
     else:
-        print('No update')
+        # if the data has not been updated, then just update the timestamp
+        df_history.loc[df_history['timestamp'] == df_history['timestamp'].max, 'timestamp'] = pd.Timestamp.now(tz='Europe/Sofia')
+        print('Updated the latest timestamp')
 except:
     df_full = pd.concat([df_history, df])
     df_full.to_csv(f'{output_path}/gold_price.csv', index=False, float_format='%.4f')
