@@ -30,10 +30,10 @@ for product in products:
         x=subset['timestamp'], y=subset['sell_gr'], name=product, mode='lines'
     ))
     fig_price_diff.add_traces(go.Scatter(
-        x=subset['timestamp'], y=subset['sell_gr'], name=product, mode='lines'
+        x=subset['timestamp'], y=subset['price_diff_gr'], name=product, mode='lines'
     ))
     fig_sell_premium.add_traces(go.Scatter(
-        x=subset['timestamp'], y=subset['sell_gr'], name=product, mode='lines'
+        x=subset['timestamp'], y=subset['sell_gr_premium'], name=product, mode='lines'
     ))
 
 fig_price.update_layout(title='Price (BGN) per 1 gr pure gold')
