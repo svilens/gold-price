@@ -54,7 +54,7 @@ class Crawler():
         )
         lines = lines_raw.text.split('\n')
         lines = [i for i in lines if '-' not in i and i not in [
-            'Всички продукти', 'Филтри', 'Продайте', 'Купете', 'Купуваме', 'Продаваме'
+            'Всички продукти', 'Филтри', 'Продайте', 'Купете', 'Купуваме', 'Продаваме', 'Намалена цена'
         ]]
         driver.close()
         return lines
