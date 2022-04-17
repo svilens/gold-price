@@ -71,14 +71,14 @@ class MarketDataFormatting():
         df['quantity'] = df['quantity'].apply(lambda x: int(x.split('/')[0]) / int(x.split('/')[1]) if '/' in x else 1 if x=='Суверен' else x).astype(float)
         df['unit'] = df['product'].apply(
             lambda x:
-                'gr' if 'грам' in x
-                else 'oz' if 'унция' in x
-                else 'fr' if 'франк' in x
+                'fr' if 'франк' in x
                 else 'sov' if 'Суверен' in x
                 else 'cor' if 'корони' in x
                 else 'kruger' if 'Кругерранд' in x
                 else 'duc' if 'дуката' in x
                 else 'eagle' if 'орел' in x
+                else 'gr' if 'грам' in x
+                else 'oz' if 'унция' in x
                 else 'other'
         )
         return self
@@ -108,23 +108,27 @@ class MarketDataFormatting():
         product_temp = (
             product
             .replace("златно ", "").replace("златна ", "")
+            .replace("абонаментно ", "")
+            .replace("златен ", "").replace("монета ", "")
+            .replace("австрийска ", "")
+            .replace("френски ", "").replace("американски ", "")
+            .replace("Австралийско ", "").replace("австралийски ", "")
+            .replace("Великобритания ", "")
             # alphabet inconsistency
             .replace("златнo ", "")
-            .replace("златен ", "").replace("монета ", "")
-            .replace("австрийска", "").replace("френски", "")
-            .replace("Австралийско", "").replace("австралийски", "")
         ).split(" ")[2:]
         size_temp = product.split(" ")[:2]
         product_std = " ".join(product_temp) + ', ' + " ".join(size_temp)
+        if 'Елизабет' in product: product_std = "Суверен Елизабет II"
         return product_std
 
     def add_more_cols(self, df, bgn_usd, gold_price):
-        df['gr_pure'] = df.apply(lambda x: self._convert_to_gr(x['quantity'], x['unit']), axis=1)
+        df['gr_pure'] = df.apply(lambda x: self._convert_to_gr(x['quantity'], x['unit']), axis=1).round(4)
         #df['product'] = df['product'].apply(lambda x: ' '.join([word for word in x.split(' ')[2:]]) if 'франк' not in x else x)
         df['buy_gr'] = (df['buy'] / df['gr_pure']).round(2)
         df['sell_gr'] = (df['sell'] / df['gr_pure']).round(2)
         df['price_diff_gr'] = ((df['sell_gr'] - df['buy_gr']) / df['buy_gr']).round(4)
-        df['sell_gr_premium'] = (df['sell_gr'] / (gold_price * bgn_usd / 31.103) - 1).round(4)
+        df['sell_gr_premium'] = (df['sell_gr'] / (gold_price * bgn_usd / 31.1) - 1).round(4)
         df['product_std'] = df['product'].apply(self._standardize_product)
         df.insert(0, 'timestamp', pd.Timestamp.now(tz='Europe/Sofia'))
         return df

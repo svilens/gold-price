@@ -36,6 +36,7 @@ df_history = (
 )
 df_prev = df_history.loc[df_history['timestamp'] == df_history['timestamp'].max()]
 
+
 # if the data has been updated, save it
 try:
     if len(
@@ -48,9 +49,11 @@ try:
     else:
         # if the data has not been updated, then just update the timestamp
         df_history.loc[df_history['timestamp'] == df_history['timestamp'].max, 'timestamp'] = pd.Timestamp.now(tz='Europe/Sofia')
+        df_history.to_csv(f'{output_path}/gold_price.csv', index=False, float_format='%.4f')
         print('Updated the latest timestamp')
 except:
     df_full = pd.concat([df_history, df])
     df_full.to_csv(f'{output_path}/gold_price.csv', index=False, float_format='%.4f')
+    print('Exception when comparing, data updated')
 
 print('Done!')
