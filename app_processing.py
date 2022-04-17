@@ -15,7 +15,6 @@ bgn_usd = crawler.get_bgn_usd_rate(url=url_bgn_usd)
 market_data = crawler.get_market_data(url=url_market)
 #crawler.close_driver()
 
-
 # create initial df
 df_init = pd.DataFrame(
     [
