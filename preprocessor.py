@@ -69,18 +69,37 @@ class MarketDataFormatting():
         df['sell'] = df['sell'].str.replace(' лв.', '').astype(int)
         df['quantity'] = df['product'].apply(lambda x: x.split(' ')[0])
         df['quantity'] = df['quantity'].apply(lambda x: int(x.split('/')[0]) / int(x.split('/')[1]) if '/' in x else 1 if x=='Суверен' else x).astype(float)
-        df['unit'] = df['product'].apply(lambda x: 'gr' if 'грам' in x else 'oz' if 'унция' in x else 'fr' if 'франк' in x else 'суверен' if x == 'Суверен' else 'other')
+        df['unit'] = df['product'].apply(
+            lambda x:
+                'gr' if 'грам' in x
+                else 'oz' if 'унция' in x
+                else 'fr' if 'франк' in x
+                else 'sov' if 'Суверен' in x
+                else 'cor' if 'корони' in x
+                else 'kruger' if 'Кругерранд' in x
+                else 'duc' if 'дуката' in x
+                else 'eagle' if 'орел' in x
+                else 'other'
+        )
         return self
 
     def _convert_to_gr(self, quantity, unit):
         if unit == 'gr':
             result = quantity
         elif unit == 'oz':
-            result = quantity * 31.103
+            result = quantity * 31.1
         elif unit == 'fr':
-            result = 5.805
-        elif unit == 'суверен':
-            result = 7.31884
+            result = 6.45 * 0.9
+        elif unit == 'sov':
+            result = 7.99 * 0.916
+        elif unit == 'cor':
+            result = 30.483
+        elif unit == 'kruger':
+            result = quantity * 31.1 * 0.9167
+        elif unit == 'duc':
+            result = 14 * 0.986
+        elif unit == 'eagle':
+            result = 31.3 * 0.916
         else:
             result = 0
         return result
@@ -92,7 +111,8 @@ class MarketDataFormatting():
             # alphabet inconsistency
             .replace("златнo ", "")
             .replace("златен ", "").replace("монета ", "")
-            .replace("австр", "Австр").replace("френски", "Френски")
+            .replace("австрийска", "").replace("френски", "")
+            .replace("Австралийско", "").replace("австралийски", "")
         ).split(" ")[2:]
         size_temp = product.split(" ")[:2]
         product_std = " ".join(product_temp) + ', ' + " ".join(size_temp)
