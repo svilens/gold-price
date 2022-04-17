@@ -50,8 +50,8 @@ coins_dict_igold = {
     1280: {'name': 'v_10', 'weight': 10, 'buy': 1206}
 }
 
-target_max = 19910
-target_min = 19000
+target_max = 4200
+target_min = 3500
 items_max = 8
 
 start = datetime.now()
